@@ -6,6 +6,7 @@ import subprocess
 
 import hardpotato.load_data as load_data
 import hardpotato.save_data as save_data
+import hardpotato.chi760f as chi760f
 import hardpotato.chi760e as chi760e
 import hardpotato.chi1205b as chi1205b
 import hardpotato.chi601e as chi601e
@@ -17,7 +18,7 @@ import hardpotato.pico_mscript as mscript
 import hardpotato.pico_serial as serial
 
 # Potentiostat models available: 
-models_available = ['chi1205b', 'chi1242b', 'chi601e', 'chi760e', 'emstatpico']
+models_available = ['chi1205b', 'chi1242b', 'chi601e', 'chi760f', 'chi760e', 'emstatpico']
 
 # Global variables
 folder_save = '.'
@@ -43,6 +44,8 @@ class Info:
             self.info = chi1242b.Info()
         elif self.model == 'chi601e':
             self.info = chi601e.Info()
+        elif self.model == 'chi760f':
+            self.info = chi760f.Info()
         elif self.model == 'chi760e':
             self.info = chi760e.Info()
         elif self.model == 'emstatpico':
@@ -158,6 +161,10 @@ class Technique:
 
     def bipot(self, E=-0.2, sens=1e-6):
         if self.technique != 'OCP' and self.technique != 'EIS':
+            if model_pstat == 'chi760f':
+                self.tech.bipot(E, sens)
+                self.text = self.tech.text
+                self.bpot = True
             if model_pstat == 'chi760e':
                 self.tech.bipot(E, sens)
                 self.text = self.tech.text
@@ -186,9 +193,15 @@ class CV(Technique):
                                folder_save, fileName, header, path_lib,
                                **kwargs)
             Technique.__init__(self, text=self.tech.text, fileName=fileName)
-            self.technique = 'CV'
+            self.technique = 'CV'     
         if model_pstat == 'chi760e':
             self.tech = chi760e.CV(Eini, Ev1, Ev2, Efin, sr, dE, nSweeps, sens,
+                               folder_save, fileName, header, path_lib,
+                               **kwargs)
+            Technique.__init__(self, text=self.tech.text, fileName=fileName)
+            self.technique = 'CV'
+        elif model_pstat == 'chi760f':
+            self.tech = chi760f.CV(Eini, Ev1, Ev2, Efin, sr, dE, nSweeps, sens,
                                folder_save, fileName, header, path_lib,
                                **kwargs)
             Technique.__init__(self, text=self.tech.text, fileName=fileName)
@@ -231,7 +244,12 @@ class LSV(Technique):
             self.tech = chi760e.LSV(Eini, Efin, sr, dE, sens, folder_save, fileName, 
                                 header, path_lib, **kwargs)
             Technique.__init__(self, text=self.tech.text, fileName=fileName)
-            self.technique = 'LSV'  
+            self.technique = 'LSV'
+        elif model_pstat == 'chi760f':
+            self.tech = chi760f.LSV(Eini, Efin, sr, dE, sens, folder_save, fileName, 
+                                header, path_lib, **kwargs)
+            Technique.__init__(self, text=self.tech.text, fileName=fileName)
+            self.technique = 'LSV'    
         elif model_pstat == 'chi1205b':
             self.tech = chi1205b.LSV(Eini, Efin, sr, dE, sens, folder_save, fileName, 
                                 header, path_lib, **kwargs)
@@ -265,6 +283,11 @@ class CA(Technique):
             self.technique = 'CA'
         if model_pstat == 'chi760e':
             self.tech = chi760e.CA(Estep, dt, ttot, sens, folder_save, fileName,
+                               header, path_lib, **kwargs)
+            Technique.__init__(self, text=self.tech.text, fileName=fileName)
+            self.technique = 'CA'
+        elif model_pstat == 'chi760f':
+            self.tech = chi760f.CA(Estep, dt, ttot, sens, folder_save, fileName,
                                header, path_lib, **kwargs)
             Technique.__init__(self, text=self.tech.text, fileName=fileName)
             self.technique = 'CA'
@@ -304,6 +327,11 @@ class OCP(Technique):
                                     path_lib, **kwargs)
             Technique.__init__(self, text=self.tech.text, fileName=fileName)
             self.technique = 'OCP'
+        elif model_pstat == 'chi760f':
+            self.tech = chi760f.OCP(ttot, dt, folder_save, fileName, header, 
+                                    path_lib, **kwargs)
+            Technique.__init__(self, text=self.tech.text, fileName=fileName)
+            self.technique = 'OCP'
         elif model_pstat == 'chi1205b':
             self.tech = chi1205b.OCP(ttot, dt, folder_save, fileName, header, 
                                      path_lib, **kwargs)
@@ -333,6 +361,11 @@ class NPV(Technique):
                          folder_save, fileName, header, path_lib, **kwargs)
             Technique.__init__(self, text=self.tech.text, fileName=fileName)
             self.technique = 'NPV'
+        elif model_pstat == 'chi760f':
+            self.tech = chi760f.NPV(Eini, Efin, dE, tsample, twidth, tperiod, sens,
+                         folder_save, fileName, header, path_lib, **kwargs)
+            Technique.__init__(self, text=self.tech.text, fileName=fileName)
+            self.technique = 'NPV'
         elif model_pstat == 'chi601e':
             self.tech = chi601e.NPV(Eini, Efin, dE, tsample, twidth, tperiod, sens,
                          folder_save, fileName, header, path_lib, **kwargs)
@@ -351,6 +384,12 @@ class EIS(Technique):
         self.header = header
         if model_pstat == 'chi760e':
             self.tech = chi760e.EIS(Eini, low_freq, high_freq, amplitude, sens, qt, 
+                                    folder_save, fileName, header, path_lib, 
+                                    **kwargs)
+            Technique.__init__(self, text=self.tech.text, fileName=fileName)
+            self.technique = 'EIS'
+        elif model_pstat == 'chi760f':
+            self.tech = chi760f.EIS(Eini, low_freq, high_freq, amplitude, sens, qt, 
                                     folder_save, fileName, header, path_lib, 
                                     **kwargs)
             Technique.__init__(self, text=self.tech.text, fileName=fileName)

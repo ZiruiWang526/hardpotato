@@ -14,6 +14,7 @@ Currently, the following potentiostats are included in the library:
 * CHI1242B from CH Instruments (chi1242b)
 * CHI601E from CH Instruments (chi601e)
 * CHI760E from CH Instruments (chi760e)
+* CHI760F from CH Instruments (chi760f)
 * Emstat Pico from PalmSens (emstatpico)
 
 with the following techniques:
@@ -22,7 +23,7 @@ with the following techniques:
 * Linear sweep voltammetry, LSV
 * Open circuit potential, OCP
 
-For the CHI601E and CHI760E only:
+For the CHI601E and CHI760E/F only:
 * Normal pulse voltammetry, NPV
 
 # Installation
@@ -38,7 +39,7 @@ Here are quick examples on how to use the library. For more help check the [Wiki
 import hardpotato as hp
 
 # Potentiostat setup
-# Choose the correct model from ['chi760e', 'chi1205b', 'emstatpico']:
+# Choose the correct model from ['chi760f','chi760e', 'chi1205b', 'emstatpico']:
 model = 'chi760e' 
 # Write the path where the chi software is installed (this line is optional when
 # using the Pico). Make sure to use / instead of \:
