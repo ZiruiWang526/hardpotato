@@ -147,6 +147,16 @@ class Technique:
             sp.plotting.plot(ocp.t, ocp.E, show=False, fig=figNum,
                              xlab='$t$ / s', ylab='$E$ / V',
                              fileName=folder_save + '/' + self.fileName)
+        elif self.technique == 'PCA':
+            pca = load_data.PCA(self.fileName+'.txt', folder_save, model_pstat)
+            sp.plotting.plot(pca.t, pca.i, show=False, fig=figNum,
+                             xlab='$t$ / s', ylab='$i$ / A',
+                             fileName=folder_save + '/' + self.fileName)
+        elif self.technique == 'BE':
+            be = load_data.BE(self.fileName+'.txt', folder_save, model_pstat)
+            sp.plotting.plot(be.t, be.Q, show=False, fig=figNum,
+                             xlab='$t$ / s', ylab='$Q$ / C',
+                             fileName=folder_save + '/' + self.fileName)
         plt.close()    
          
 
@@ -374,7 +384,31 @@ class NPV(Technique):
         else:
             print('Potentiostat model ' + model_pstat + ' does not have NPV.')
 
+class PCA(Technique):
+    '''
+    '''
+    def __init__(self, Eini=0, E1=0, E2=0, nStep=1, pw=0.1, dt=0.1, sens=1e-6, fileName='PCA', header='PCA', **kwargs):
+        self.header = header
+        if model_pstat == 'chi760e':
+            self.tech = chi760e.EIS(Eini, E1, E2, nStep, pw, dt, sens, 
+                                    folder_save, fileName, header, path_lib, 
+                                    **kwargs)
+            Technique.__init__(self, text=self.tech.text, fileName=fileName)
+            self.technique = 'PCA'
+        else:
+            print('Potentiostat model ' + model_pstat + ' does not have PCA (Chronoamperometry).')
 
+class BE(Technique):
+    '''
+    '''
+    def __init__(self, Estep=0, iratio=1, dt=1, preE=0, pret=0, fileName='BE', header='BE', **kwargs):
+        self.header = header
+        if model_pstat == 'chi760e':
+            self.tech = chi760e.BE(Estep, iratio, dt, preE, pret, folder_save, fileName, header, path_lib, **kwargs)
+            Technique.__init__(self, text=self.tech.text, fileName=fileName)
+            self.technique = 'BE'
+        else:
+            print('Potentiostat model ' + model_pstat + ' does not have BE.')
 
 class EIS(Technique):
     '''
