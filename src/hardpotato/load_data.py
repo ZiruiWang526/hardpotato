@@ -126,7 +126,7 @@ class PCA(Read):
         self.read(text, model)
         if model[0:3] == 'chi':
             self.t = self.x
-            self.E = self.y
+            self.i = self.y
 
 class BE(Read):
     '''
