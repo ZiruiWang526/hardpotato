@@ -192,7 +192,7 @@ class NPV():
 
         self.validate(Eini, Efin, dE, tsample, twidth, tperiod, sens)
 
-        self.head = 'C\x02\0\0\nfolder: ' + folder + '\n' + fileOverride + \
+        self.head = 'C\x02\0\0\nfolder: ' + folder + '\n' + '\nfileoverride\n' + \
                     'header: ' + header + '\n\n'
         self.body = 'tech=NPV\nei=' + str(Eini) + '\nef=' + str(Efin) + \
                     '\nincre=' + str(dE) + '\npw=' + str(tsample) + \
@@ -266,7 +266,72 @@ class CA:
         self.foot = '\n forcequit: yesiamsure\n'
         self.text = self.head + self.body2 + self.foot
 
+class PCA:
+    '''
+    '''
+    def __init__(self, Eini, E1, E2, nStep, pw, dt, sens, folder, fileName, header, 
+                 path_lib, **kwargs):
+        self.fileName = fileName
+        self.folder = folder
+        self.text = ''
 
+        if 'qt' in kwargs:
+            qt = kwargs.get('qt')
+        else:
+            qt = 2
+        if 'resistance' in kwargs:
+            resistance = kwargs.get('resistance')
+        else:
+            resistance = 0
+        
+        # correcting parameters:
+        Ei = Eini
+        if E1 > E2:
+            eh = E1
+            el = E2
+            pn = 'p'
+        else:
+            eh = E2
+            el = E1
+            pn = 'n'
+
+        self.head = 'C\x02\0\0\nfolder: ' + folder + '\nfileoverride\n' + \
+                    'header: ' + header + '\n\n'
+        self.body = 'tech=CA\nei=' + str(Ei) + '\neh=' + str(eh) + '\nel=' + str(el) + '\npn=' + pn + \
+                    '\ncl=' + str(nStep) + '\npw=' + str(pw) + '\nsi=' + str(dt) + \
+                    '\nsens=' + str(sens) 
+        if resistance: # In case IR compensation is required
+            self.body2 = self.body + '\nmir=' + str(resistance) + \
+                         '\nircompon\nrun\nircompoff\nsave:' + self.fileName + \
+                         '\ntsave:' + self.fileName
+        else:
+            self.body2 = self.body + '\nrun\nsave:' + self.fileName + \
+                         '\ntsave:' + self.fileName 
+        self.foot = '\n forcequit: yesiamsure\n'
+        self.text = self.head + self.body2 + self.foot
+
+        self.validate(Eini, E1, E2, nStep, pw, dt, sens)
+
+
+    def validate(self, Eini, E1, E2, nStep, pw, dt, sens):
+        info = Info()
+        info.limits(Eini, info.E_min, info.E_max, 'Estep', 'V')
+        info.limits(E1, info.E_min, info.E_max, 'Estep', 'V')
+        info.limits(E2, info.E_min, info.E_max, 'Estep', 'V')
+        #info.limits(dt, info.dt_min, info.dt_max, 'dt', 's')
+        #info.limits(ttot, info.ttot_min, info.ttot_max, 'ttot', 's')
+        #info.limits(sens, info.sens_min, info.sens_max, 'sens', 'A/V')
+
+    def bipot(self, E, sens):
+        # Validate bipot:
+        info = Info()
+        info.limits(E, info.E_min, info.E_max, 'E2', 'V')
+        #info.limits(sens, info.sens_min, info.sens_max, 'sens2', 'A/V')
+        self.body2 = self.body + \
+                    '\ne2=' + str(E) + '\nsens2=' + str(sens) + '\ni2on' + \
+                    '\nrun\nsave:' + self.fileName + '\ntsave:' + self.fileName 
+        self.foot = '\n forcequit: yesiamsure\n'
+        self.text = self.head + self.body2 + self.foot
 
 class OCP:
     '''
@@ -300,6 +365,38 @@ class OCP:
         info = Info()
         #info.limits(dt, info.dt_min, info.dt_max, 'dt', 's')
         #info.limits(ttot, info.ttot_min, info.ttot_max, 'ttot', 's')
+
+class BE:
+
+    def __init__(self, Estep, iratio, dt, preE, pret, folder, fileName, header, path_lib, **kwargs):
+        self.fileName = fileName
+        self.folder = folder
+        self.text = ''
+
+        if 'qt' in kwargs:
+            qt = kwargs.get('qt')
+        else:
+            qt = 2
+        if 'resistance' in kwargs:
+            resistance = kwargs.get('resistance')
+        else:
+            resistance = 0 
+
+        self.head = 'C\x02\0\0\nfolder: ' + folder + '\nfileoverride\n' + \
+                    'header: ' + header + '\n\n'
+        self.body = 'tech=be\nei=' + str(Estep) + '\niratio=' + str(iratio) + \
+                    '\nsi=' + str(dt) + '\nbepe=' + str(preE) + '\nbept=' + str(pret) + \
+                    '\nrun\nsave:' + self.fileName + '\ntsave:' + self.fileName 
+        self.foot = '\nforcequit: yesiamsure\n'
+        self.text = self.head + self.body + self.foot
+
+        self.validate(Estep)
+
+    def validate(self, Estep):
+        info = Info()
+        info.limits(Estep, info.E_min, info.E_max, 'Estep', 'V')
+        #info.limits(ttot, info.ttot_min, info.ttot_max, 'ttot', 's')
+
 
 class EIS:
     '''
