@@ -390,7 +390,7 @@ class PCA(Technique):
     def __init__(self, Eini=0, E1=0, E2=0, nStep=1, pw=0.1, dt=0.1, sens=1e-6, fileName='PCA', header='PCA', **kwargs):
         self.header = header
         if model_pstat == 'chi760e':
-            self.tech = chi760e.EIS(Eini, E1, E2, nStep, pw, dt, sens, 
+            self.tech = chi760e.PCA(Eini, E1, E2, nStep, pw, dt, sens, 
                                     folder_save, fileName, header, path_lib, 
                                     **kwargs)
             Technique.__init__(self, text=self.tech.text, fileName=fileName)
