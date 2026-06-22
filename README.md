@@ -24,7 +24,7 @@ with the following techniques:
 * Open circuit potential, OCP
 
 For the CHI601E and CHI760E/F only:
-* Normal pulse voltammetry, NPV
+* Normal pulse voltammetry (NPV), Pulsed chronoamperometry (PCA), and bulk electrolysis (BE)
 
 # Installation
 Open a console and type:
@@ -109,3 +109,6 @@ Hard Potato was developed at the [Beckman Institute](https://beckman.illinois.ed
 * Lead: Oliver Rodriguez ([oliverrdz.xyz](https://oliverrdz.xyz), oliver.rdz@softpotato.xyz)
 * Support: Michael Pence (mapence2@illinois.edu)
 * PI: Joaquin Rodriguez-Lopez (joaquinr@illinois.edu)
+
+# Update
+Last updated by Zirui Wang (ziruiw2@illinois.edu), June 2026
